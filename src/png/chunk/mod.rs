@@ -1,7 +1,7 @@
 use std::io::{Read};
 use std::str;
-extern crate byteorder;
-use self::byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
+use std::fmt;
+use byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
 mod types;
 
 pub const CHUNK_META_SIZE: usize = 12; 
@@ -42,11 +42,16 @@ impl ChunkType {
 		string
 	}
 }
+impl fmt::Debug for ChunkType {
+	fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+		write!(fmt, "{}", self.as_string())
+	}
+}
 pub struct Chunk {
-	pub data_length: u32,
-	pub t: ChunkType,
-	pub data: ChunkData,
-	pub crc: u32,
+	data_length: u32,
+	t: ChunkType,
+	data: ChunkData,
+	crc: u32,
 }
 
 impl Chunk {
@@ -71,7 +76,6 @@ impl Chunk {
 					Ok(ihdr) => ihdr,
 					Err(err) => return Err(err),
 				};
-				println!("{:?}", ihdr.as_string());
 				ChunkData::Ihdr(ihdr)
 			},
 			"PLTE" => {
@@ -105,13 +109,13 @@ impl Chunk {
 				}
 
 				if !t.is_safe_to_copy() {
-					println!("Ignoring unhandled non-critical chunk {} because it is not safely copyable", chunk_name);
+					println!("[WARN] Ignoring unhandled non-critical chunk {} because it is not safely copyable", chunk_name);
 					let mut byte_bin: Vec<u8> = Vec::new();
 					let _ = r.take(data_length as u64).read_to_end(&mut byte_bin);
 					ChunkData::Ignored
 				}
 				else {
-					println!("Copying unhandled non-critical chunk {}", chunk_name);
+					println!("[INFO] Copying unhandled non-critical chunk {}", chunk_name);
 
 					let unknown = match types::Unknown::from_reader(r, data_length as usize) {
 						Ok(unknown) => unknown,
@@ -132,8 +136,15 @@ impl Chunk {
 	pub fn data(&self) -> &ChunkData {
 		&self.data
 	}
+	pub fn ctype(&self) -> &ChunkType {
+		&self.t
+	}
+	pub fn data_len(&self) -> u32 {
+		self.data_length
+	}
 }
 
+#[derive(Debug)]
 pub enum ChunkData {
 	Ihdr(types::Ihdr),
 	Plte(types::Plte),

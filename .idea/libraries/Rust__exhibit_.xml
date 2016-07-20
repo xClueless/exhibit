@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Rust &lt;exhibit&gt;">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/rust-1.11.0-src.zip!/rust-801d2682df6cac505916644ebe678c9105f4c418/src/libstd" />
+      <root url="jar://$USER_HOME$/Downloads/rust-1.11.0-src.zip!/rust-801d2682df6cac505916644ebe678c9105f4c418/src/libcore" />
+      <root url="jar://$USER_HOME$/Downloads/rust-1.11.0-src.zip!/rust-801d2682df6cac505916644ebe678c9105f4c418/src/libcollections" />
+      <root url="jar://$USER_HOME$/Downloads/rust-1.11.0-src.zip!/rust-801d2682df6cac505916644ebe678c9105f4c418/src/liballoc" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,5 +1,6 @@
 use std::io::{Read, BufReader};
 use std::str;
+use std::str::FromStr;
 mod chunk;
 mod metadata;
 
@@ -10,8 +11,8 @@ extern crate flate2;
 use self::flate2::read::ZlibDecoder;
 
 pub struct Image {
-	pub sig: metadata::Signature,
-	pub chunks: Vec<chunk::Chunk>,
+	sig: metadata::Signature,
+	chunks: Vec<chunk::Chunk>,
 }
 
 impl Image {
@@ -32,18 +33,24 @@ impl Image {
 				Ok(c) => c,
 				Err(err) => return Err(err),
 			};
-			bytes_read += chunk::CHUNK_META_SIZE + c.data_length as usize;
+			bytes_read += chunk::CHUNK_META_SIZE + c.data_len() as usize;
 			chunks.push(c);
 		}
 
 		if chunks.len() == 0
 		{
-			return Err(String::from_str("Invalid image. Doesn't contain any chunks."));
+			return Err("Invalid image. Doesn't contain any chunks.".to_owned());
 		}
 
 
 		Ok(Image{sig:sig, chunks:chunks})
 	}
+	pub fn signature<'a>(&'a self) -> &'a metadata::Signature {
+        &self.sig
+    }
+    pub fn chunks<'a>(&'a self) -> &'a [chunk::Chunk] {
+        &self.chunks
+    }
 	// pub fn condense_idat(&self) {
 	// 	let idat_iter = self.chunks.iter().filter(|&x| x.data() == chunk::ChunkData::Idat);
 

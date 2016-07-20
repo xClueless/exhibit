@@ -1,6 +1,7 @@
 extern crate byteorder;
 use self::byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
 use std::io::Read;
+use std::fmt;
 
 const IHDR_SIZE: usize = 13; 
 pub struct Ihdr {
@@ -84,9 +85,13 @@ impl Ihdr {
 		};
 		Ok(Ihdr{width:width,height:height,bpp:bpp,colour_type:colour_type, compression_method:compression_method, filter_method:filter_method, interlace_method:interlace_method})
 	}
-	pub fn as_string(&self) -> String {
-		format!("{}x{} {}BPP, {:?}, {:?}, {:?}, {:?}", self.width, self.height, self.bpp, self.colour_type, self.compression_method, self.filter_method, self.interlace_method)
-	}
+}
+impl fmt::Debug for Ihdr {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "{}x{} {}BPP, {:?}, {:?}, {:?}, {:?}",
+               self.width, self.height, self.bpp, self.colour_type,
+               self.compression_method, self.filter_method, self.interlace_method)
+    }
 }
 
 #[derive(Debug)]
@@ -126,6 +131,7 @@ pub struct Rgb {
 }
 
 const PLTE_SIZE: usize = 3; 
+#[derive(Debug)]
 pub struct Plte {
 	palette: Vec<Rgb>,
 }
@@ -188,8 +194,14 @@ impl Idat {
 		&self.compressed_data
 	}
 }
+impl fmt::Debug for Idat {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "IDAT - {} compressed bytes", self.compressed_data.len())
+    }
+}
 
-const SRGB_SIZE: usize = 1; 
+const SRGB_SIZE: usize = 1;
+#[derive(Debug)]
 pub struct sRGB {
 	rendering_intent: RenderingIntent,
 }
@@ -259,5 +271,10 @@ impl Unknown {
 	}
 	pub fn data(&self) -> &Vec<u8> {
 		&self.data
+	}
+}
+impl fmt::Debug for Unknown {
+	fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+		write!(fmt, "Unknown Chunk Type - {} bytes", self.data.len())
 	}
 }
