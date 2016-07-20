@@ -1,6 +1,3 @@
-#![feature(collections)]
-#![feature(convert)]
-
 extern crate byteorder;
 extern crate getopts;
 pub mod png;
